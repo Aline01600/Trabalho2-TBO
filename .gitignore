@@ -1,0 +1,34 @@
+# Ignora arquivos objeto e executáveis
+*.o
+*.obj
+*.exe
+*.out
+*.a
+*.so
+*.dll
+
+# Ignora arquivos de dependência
+*.d
+
+# Ignora arquivos de backup e temporários
+*~
+*.swp
+*.tmp
+
+# Ignora diretórios de build
+/build/
+/bin/
+/Debug/
+/Release/
+
+# Ignora arquivos gerados por IDEs
+.vscode/
+*.code-workspace
+.idea/
+*.suo
+*.user
+*.vcxproj.*
+*.DS_Store
+
+# Ignora arquivos de log
+*.log
