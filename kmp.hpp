@@ -4,6 +4,6 @@
 #include <string>
 #include <vector>
 
-std::vector<int> buscarKMP(const std::string& texto, const std::string& padrao);
+std::vector<size_t> buscarKMP(const std::string& texto, const std::string& padrao);
 
 #endif
