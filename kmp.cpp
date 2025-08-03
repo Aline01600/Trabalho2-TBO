@@ -71,9 +71,11 @@ std::vector<size_t> buscarKMP(const std::string& texto, const std::string& padra
     
     vector<size_t> posicoes;
     vector<size_t> prefixo = construirPrefixo(pattern);
-    size_t j = 0;
+    size_t j = 0, n = text.length(), total_ocorrencias = 0;
 
-    for (size_t i = 0; i < text.length(); i++) {
+    posicoes.reserve(20);   // reserva 20 espaços de memória para guardar as posições encontradas. Isso evita de ficar dobrando o vector a cada nova palavra encontrada. O(n) -> O(1) para as 20 primeiras posições
+
+    for (size_t i = 0; i < n; i++) {
         while (j > 0 && text[i] != pattern[j])
             j = prefixo[j - 1];
 
@@ -84,8 +86,11 @@ std::vector<size_t> buscarKMP(const std::string& texto, const std::string& padra
             size_t pos = i - j + 1;
             posicoes.push_back(pos);
             j = prefixo[j - 1];
+            total_ocorrencias++;
         }
     }
- 
+
+    cout << "\nNúmero total de ocorrências desta palavra: " << total_ocorrencias << endl;
+
     return posicoes;
 }
