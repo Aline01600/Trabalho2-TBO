@@ -3,34 +3,19 @@
 #include <string>
 #include <cctype>
 #include <vector>
+#include <unordered_set>
+#include <algorithm>
 
 using namespace std;
 
 const int TAM = 1009; // Tamanho da tabela hash (primo para melhor distribuição)
 
-// Lista de stopwords comuns em português
-const string STOPWORDS[] = {
-    "a", "o", "e", "de", "do", "da", "em", "um", "uma", "os", "as", "no", "na",
-    "por", "com", "que", "para", "como", "se", "não", "mas", "ou", "já", "foi",
-    "são", "é", "dos", "das", "ao", "aos", "às", "há", "à", "isso", "esta", "este",
-    "esses", "essas", "também", "tão", "só", "quando", "quanto", "pelo", "pela", "porque"
-};
-const int QTD_STOPWORDS = sizeof(STOPWORDS) / sizeof(string);
-
-// Função para verificar se a palavra é uma stopword
-bool eh_stopword(const string& palavra) {
-    for (int i = 0; i < QTD_STOPWORDS; ++i) {
-        if (palavra == STOPWORDS[i]) return true;
-    }
-    return false;
-}
-
 // Função para normalizar a palavra (remover pontuação e colocar em minúsculas)
 string normalizar(string palavra) {
     string resultado;
     for (char c : palavra) {
-        if (isalpha(c)) {
-            resultado += tolower(c);
+        if (isalpha((unsigned char)c)) {
+            resultado += tolower((unsigned char)c);
         }
     }
     return resultado;
@@ -53,7 +38,7 @@ struct Entrada {
 struct TabelaHash {
     Entrada tabela[TAM];
 
-    int hash(string chave) {
+    int hash(const string& chave) {
         int h = 0;
         for (char c : chave) {
             h = (31 * h + c) % TAM;
@@ -61,7 +46,7 @@ struct TabelaHash {
         return h;
     }
 
-    void inserir(string chave) {
+    void inserir(const string& chave) {
         int h = hash(chave);
         int original = h;
         while (tabela[h].ocupado && tabela[h].chave != chave) {
@@ -89,18 +74,36 @@ struct TabelaHash {
     }
 };
 
-// Lê todas as palavras do arquivo e insere na tabela
-void processar_arquivo(const string& nome_arquivo, TabelaHash& tabela) {
+// Função para carregar stopwords de um arquivo em um unordered_set
+unordered_set<string> carregarStopwords(const string& nome_arquivo) {
+    unordered_set<string> stopwords;
     ifstream arquivo(nome_arquivo);
     if (!arquivo) {
-        cerr << "Erro ao abrir o arquivo." << endl;
+        cerr << "Aviso: não foi possível abrir o arquivo de stopwords: " << nome_arquivo << endl;
+        return stopwords; // vazio
+    }
+    string palavra;
+    while (arquivo >> palavra) {
+        palavra = normalizar(palavra);
+        if (!palavra.empty()) {
+            stopwords.insert(palavra);
+        }
+    }
+    return stopwords;
+}
+
+// Lê todas as palavras do arquivo e insere na tabela (ignorando stopwords)
+void processar_arquivo(const string& nome_arquivo, TabelaHash& tabela, const unordered_set<string>& stopwords) {
+    ifstream arquivo(nome_arquivo);
+    if (!arquivo) {
+        cerr << "Erro ao abrir o arquivo: " << nome_arquivo << endl;
         return;
     }
 
     string palavra;
     while (arquivo >> palavra) {
         string limpa = normalizar(palavra);
-        if (!limpa.empty() && !eh_stopword(limpa)) {
+        if (!limpa.empty() && stopwords.count(limpa) == 0) {
             tabela.inserir(limpa);
         }
     }
@@ -110,15 +113,24 @@ void processar_arquivo(const string& nome_arquivo, TabelaHash& tabela) {
 
 int main() {
     TabelaHash tabela;
-    string nome_arquivo;
 
-    nome_arquivo = "texto.txt";
+    // Carregue as stopwords de arquivo
+    unordered_set<string> stopwords = carregarStopwords("stopwords.txt");
+
+    string nome_arquivo;
    
-    processar_arquivo(nome_arquivo, tabela);
+    nome_arquivo = "texto.txt";
+
+    processar_arquivo(nome_arquivo, tabela, stopwords);
 
     auto palavras = tabela.obter_palavras();
 
-    cout << "\nPalavras mais frequentes:\n";
+    // Ordenar por frequência (decrescente)
+    sort(palavras.begin(), palavras.end(), [](const auto& a, const auto& b) {
+        return a.second > b.second;
+    });
+
+    cout << "\nPalavras mais frequentes (ignorando stopwords):\n";
     for (auto& par : palavras) {
         cout << par.first << ": " << par.second << endl;
     }
