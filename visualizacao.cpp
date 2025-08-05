@@ -1,35 +1,15 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <cctype>
 #include <vector>
 #include <unordered_set>
-#include <algorithm>
+#include "utilitarios.hpp"
 
 using namespace std;
 
-const int TAM = 1009; // Tamanho da tabela hash (primo para melhor distribuição)
+const int TAM = 1009;
 
-// Função para normalizar a palavra (remover pontuação e colocar em minúsculas)
-string normalizar(string palavra) {
-    // Remove pontuação no início
-    while (!palavra.empty() && ispunct((unsigned char)palavra.front())) {
-        palavra.erase(palavra.begin());
-    }
-    // Remove pontuação no fim
-    while (!palavra.empty() && ispunct((unsigned char)palavra.back())) {
-        palavra.pop_back();
-    }
-    
-    // Se a palavra não estiver vazia, transforma a primeira letra em minúscula
-    if (!palavra.empty()) {
-        //Só funciona para ASCII
-        palavra[0] = tolower((unsigned char)palavra[0]);
-    }
-    return palavra;
-}
-
-// Estrutura de entrada na tabela hash
+// Estrutura de entrada
 struct Entrada {
     string palavra;
     int frequencia;
@@ -42,7 +22,7 @@ struct Entrada {
     }
 };
 
-// Tabela Hash com endereçamento aberto linear
+// Tabela Hash
 struct TabelaHash {
     Entrada tabela[TAM];
 
@@ -59,7 +39,7 @@ struct TabelaHash {
         int original = h;
         while (tabela[h].ocupado && tabela[h].palavra != chave) {
             h = (h + 1) % TAM;
-            if (h == original) return; // tabela cheia
+            if (h == original) return;
         }
 
         if (!tabela[h].ocupado) {
@@ -82,13 +62,42 @@ struct TabelaHash {
     }
 };
 
-// Função para carregar stopwords de um arquivo em um unordered_set
+// QuickSort (ordena por frequência decrescente)
+void quickSort(vector<pair<string, int>>& v, int esquerda, int direita) {
+    if (esquerda >= direita) return;
+
+    int meio = esquerda + (direita - esquerda) / 2;
+    int pivo = v[meio].second;
+
+    int i = esquerda;
+    int j = direita;
+
+    while (i <= j) {
+        while (v[i].second > pivo) i++;  // Maior frequência primeiro
+        while (v[j].second < pivo) j--;
+
+        if (i <= j) {
+            pair<string, int> temp = v[i];
+            v[i] = v[j];
+            v[j] = temp;
+            i++;
+            j--;
+        }
+    }
+
+    if (esquerda < j)
+        quickSort(v, esquerda, j);
+    if (i < direita)
+        quickSort(v, i, direita);
+}
+
+// Carregar stopwords
 unordered_set<string> carregarStopwords(const string& nome_arquivo) {
     unordered_set<string> stopwords;
     ifstream arquivo(nome_arquivo);
     if (!arquivo) {
         cerr << "Aviso: não foi possível abrir o arquivo de stopwords: " << nome_arquivo << endl;
-        return stopwords; // vazio
+        return stopwords;
     }
     string palavra;
     while (arquivo >> palavra) {
@@ -100,7 +109,7 @@ unordered_set<string> carregarStopwords(const string& nome_arquivo) {
     return stopwords;
 }
 
-// Lê todas as palavras do arquivo e insere na tabela (ignorando stopwords)
+// Processar arquivo de texto
 void processar_arquivo(const string& nome_arquivo, TabelaHash& tabela, const unordered_set<string>& stopwords) {
     ifstream arquivo(nome_arquivo);
     if (!arquivo) {
@@ -122,25 +131,20 @@ void processar_arquivo(const string& nome_arquivo, TabelaHash& tabela, const uno
 int main() {
     TabelaHash tabela;
 
-    // Carregue as stopwords de arquivo
     unordered_set<string> stopwords = carregarStopwords("stopwords.txt");
 
-    string nome_arquivo;
-   
-    nome_arquivo = "texto.txt";
+    string nome_arquivo = "texto.txt";
 
     processar_arquivo(nome_arquivo, tabela, stopwords);
 
     auto palavras = tabela.obter_palavras();
 
-    // Ordenar por frequência (decrescente)
-    sort(palavras.begin(), palavras.end(), [](const auto& a, const auto& b) {
-        return a.second > b.second;
-    });
+    // Ordenar com quicksort por frequência decrescente
+    quickSort(palavras, 0, palavras.size() - 1);
 
     cout << "\nPalavras mais frequentes (ignorando stopwords):\n";
     for (auto& par : palavras) {
-        cout << par.first << ": " << par.second << endl;
+        cout << par.first << "  " << par.second << endl;
     }
 
     return 0;
