@@ -12,23 +12,31 @@ const int TAM = 1009; // Tamanho da tabela hash (primo para melhor distribuiçã
 
 // Função para normalizar a palavra (remover pontuação e colocar em minúsculas)
 string normalizar(string palavra) {
-    string resultado;
-    for (char c : palavra) {
-        if (isalpha((unsigned char)c)) {
-            resultado += tolower((unsigned char)c);
-        }
+    // Remove pontuação no início
+    while (!palavra.empty() && ispunct((unsigned char)palavra.front())) {
+        palavra.erase(palavra.begin());
     }
-    return resultado;
+    // Remove pontuação no fim
+    while (!palavra.empty() && ispunct((unsigned char)palavra.back())) {
+        palavra.pop_back();
+    }
+    
+    // Se a palavra não estiver vazia, transforma a primeira letra em minúscula
+    if (!palavra.empty()) {
+        //Só funciona para ASCII
+        palavra[0] = tolower((unsigned char)palavra[0]);
+    }
+    return palavra;
 }
 
 // Estrutura de entrada na tabela hash
 struct Entrada {
-    string chave;
+    string palavra;
     int frequencia;
     bool ocupado;
 
     Entrada() {
-        chave = "";
+        palavra = "";
         frequencia = 0;
         ocupado = false;
     }
@@ -49,13 +57,13 @@ struct TabelaHash {
     void inserir(const string& chave) {
         int h = hash(chave);
         int original = h;
-        while (tabela[h].ocupado && tabela[h].chave != chave) {
+        while (tabela[h].ocupado && tabela[h].palavra != chave) {
             h = (h + 1) % TAM;
             if (h == original) return; // tabela cheia
         }
 
         if (!tabela[h].ocupado) {
-            tabela[h].chave = chave;
+            tabela[h].palavra = chave;
             tabela[h].frequencia = 1;
             tabela[h].ocupado = true;
         } else {
@@ -67,7 +75,7 @@ struct TabelaHash {
         vector<pair<string, int>> palavras;
         for (int i = 0; i < TAM; ++i) {
             if (tabela[i].ocupado) {
-                palavras.push_back({tabela[i].chave, tabela[i].frequencia});
+                palavras.push_back({tabela[i].palavra, tabela[i].frequencia});
             }
         }
         return palavras;
