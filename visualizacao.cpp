@@ -13,18 +13,16 @@ const int TAM = 1009;
 struct Entrada {
     string palavra;
     int frequencia;
-    bool ocupado;
 
-    Entrada() {
-        palavra = "";
-        frequencia = 0;
-        ocupado = false;
-    }
+    Entrada(const string& p) : palavra(p), frequencia(1) {}
 };
 
-// Tabela Hash
 struct TabelaHash {
-    Entrada tabela[TAM];
+    vector<vector<Entrada>> tabela;
+
+    TabelaHash() {
+        tabela.resize(TAM);  // inicializa com TAM buckets
+    }
 
     int hash(const string& chave) {
         int h = 0;
@@ -36,26 +34,20 @@ struct TabelaHash {
 
     void inserir(const string& chave) {
         int h = hash(chave);
-        int original = h;
-        while (tabela[h].ocupado && tabela[h].palavra != chave) {
-            h = (h + 1) % TAM;
-            if (h == original) return;
+        for (auto& entrada : tabela[h]) {
+            if (entrada.palavra == chave) {
+                entrada.frequencia++;
+                return;
+            }
         }
-
-        if (!tabela[h].ocupado) {
-            tabela[h].palavra = chave;
-            tabela[h].frequencia = 1;
-            tabela[h].ocupado = true;
-        } else {
-            tabela[h].frequencia++;
-        }
+        tabela[h].emplace_back(chave);  // não achou, insere novo
     }
 
     vector<pair<string, int>> obter_palavras() {
         vector<pair<string, int>> palavras;
-        for (int i = 0; i < TAM; ++i) {
-            if (tabela[i].ocupado) {
-                palavras.push_back({tabela[i].palavra, tabela[i].frequencia});
+        for (auto& bucket : tabela) {
+            for (auto& entrada : bucket) {
+                palavras.push_back({entrada.palavra, entrada.frequencia});
             }
         }
         return palavras;
