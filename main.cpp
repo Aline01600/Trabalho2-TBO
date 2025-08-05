@@ -1,7 +1,5 @@
 #include <iostream>
 #include <string>
-#include <fstream>
-#include <sstream>
 #include <vector>
 #include "kmp.hpp"
 #include "utilidades.hpp"
