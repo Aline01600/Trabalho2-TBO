@@ -10,5 +10,6 @@ string paraMinusculo(const string& s);
 string removerAcentos(const string& s);
 string lerArquivo(const string& nomeArquivo);
 string normalizarTexto(const string& s);
+string normalizar(const string& palavra);
 
 #endif

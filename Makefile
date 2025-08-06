@@ -5,8 +5,8 @@ CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -O2
 
 # Arquivos
-SOURCES = main.cpp kmp.cpp utilidades.cpp
-HEADERS = kmp.hpp utilidades.hpp
+SOURCES = main.cpp kmp.cpp utilidades.cpp cifra.cpp visualizacao.cpp
+HEADERS = kmp.hpp utilidades.hpp cifra.hpp visualizacao.hpp
 OBJECTS = $(SOURCES:.cpp=.o)
 
 # Executável

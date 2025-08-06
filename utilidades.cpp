@@ -93,3 +93,13 @@ string lerArquivo(const string& nomeArquivo) {
 
     return buffer.str(); // converte o buffer em string e retorna
 }
+
+string normalizar(const string& palavra) {
+    string limpa;
+    for (unsigned char c : palavra) {
+        if (isalpha(c) || (c >= 128)) {
+            limpa += tolower(c);
+        }
+    }
+    return limpa;
+}

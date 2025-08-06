@@ -5,12 +5,14 @@
 #include "kmp.hpp"
 #include "utilidades.hpp"
 #include "cifra.hpp"
+#include "visualizacao.hpp"
 
 using namespace std;
 
 // Cabeçalhos das funções que administram as tarefas
 void administraKMP(const string& texto);
 void administraCifra(const string& texto);
+void administraVisualizacao();
 
 void mostrarResumoEGerarArquivoOpcional(const string& texto, const string& nomeArquivo, int linhasParaMostrar = 10) {
     // Mostra as primeiras linhas no terminal
@@ -69,7 +71,7 @@ int main() {
 cout << "           MENU                " << endl;
 cout << "===============================" << endl;
 cout << "1 - Busca com KMP" << endl;
-cout << "2 - Visualizar Texto Destacado" << endl;
+cout << "2 - Visualizar" << endl;
 cout << "3 - Cifrar / Decifrar Texto" << endl;
 cout << "0 - Sair" << endl;
 cout << "===============================" << endl;
@@ -79,6 +81,9 @@ cout << "Escolha uma opcao: ";
         {
         case 1:
             administraKMP(texto);
+            break;
+        case 2:
+            administraVisualizacao();
             break;
         case 3:
             administraCifra(texto);
@@ -137,4 +142,24 @@ void administraCifra(const string& texto) {
 
     cout << "\nPressione Enter para continuar...";
     cin.get(); // espera o Enter para continuar
+}
+
+void administraVisualizacao(){
+    TabelaHash tabela;
+
+    unordered_set<string> stopwords = carregarStopwords("stopwords.txt");
+
+    string nome_arquivo = "texto.txt";
+
+    processar_arquivo(nome_arquivo, tabela, stopwords);
+
+    auto palavras = tabela.obter_palavras();
+
+    // Ordenar com quicksort por frequência decrescente
+    quickSort(palavras, 0, palavras.size() - 1);
+
+    cout << "\nPalavras mais frequentes do Texto:\n";
+    for (auto& par : palavras) {
+        cout << par.first << "  " << par.second << endl;
+    }
 }
