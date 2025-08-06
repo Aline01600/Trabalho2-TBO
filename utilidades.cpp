@@ -94,6 +94,20 @@ string lerArquivo(const string& nomeArquivo) {
     return buffer.str(); // converte o buffer em string e retorna
 }
 
+
+void imprimirPosicoes(const vector<size_t>& posicoes) {
+    if (posicoes.empty()) {
+        cout << "Palavra não encontrada no texto." << endl;
+    } else {
+        cout << "Palavra encontrada nas posições: ";
+        for (size_t pos : posicoes) {
+            cout << pos << " ";
+        }
+        cout << endl << endl;
+    }
+}
+
+
 string normalizar(const string& palavra) {
     string limpa;
     for (unsigned char c : palavra) {

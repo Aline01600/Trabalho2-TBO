@@ -11,5 +11,6 @@ string removerAcentos(const string& s);
 string lerArquivo(const string& nomeArquivo);
 string normalizarTexto(const string& s);
 string normalizar(const string& palavra);
+void imprimirPosicoes(const vector<size_t>& posicoes);
 
 #endif

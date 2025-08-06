@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "kmp.hpp"
+#include "datamining.hpp"
 #include "utilidades.hpp"
 #include "cifra.hpp"
 #include "visualizacao.hpp"
@@ -13,6 +14,7 @@ using namespace std;
 void administraKMP(const string& texto);
 void administraCifra(const string& texto);
 void administraVisualizacao();
+void administraDataMining(const string& texto);
 
 void mostrarResumoEGerarArquivoOpcional(const string& texto, const string& nomeArquivo, int linhasParaMostrar = 10) {
     // Mostra as primeiras linhas no terminal
@@ -61,7 +63,7 @@ int main() {
         cout << "├──────────────────────────────────────┤" << endl;
         cout << "│ 1 - Busca com KMP                    │" << endl;
         cout << "│ 2 - Opção 2                          │" << endl;
-        cout << "│ 3 - Cifrar / Decifrar                │" << endl;
+        cout << "│ 3 - Opção 3                          │" << endl;
         cout << "│ 0 - Sair                             │" << endl;
         cout << "└──────────────────────────────────────┘" << endl;
         cout << "Escolha uma opção: ";
@@ -73,6 +75,7 @@ cout << "===============================" << endl;
 cout << "1 - Busca com KMP" << endl;
 cout << "2 - Visualizar" << endl;
 cout << "3 - Cifrar / Decifrar Texto" << endl;
+cout << "4 - Data Mining" << endl;
 cout << "0 - Sair" << endl;
 cout << "===============================" << endl;
 cout << "Escolha uma opcao: ";
@@ -87,6 +90,9 @@ cout << "Escolha uma opcao: ";
             break;
         case 3:
             administraCifra(texto);
+            break;
+        case 4:
+            administraDataMining(texto);
             break;
         case 0:
             return 0;
@@ -110,17 +116,7 @@ void administraKMP(const string& texto) {
     getline(cin, palavra);
 
     vector<size_t> posicoes = buscarKMP(texto, palavra);
-
-    if (posicoes.empty()) {
-        cout << "Palavra não encontrada no texto." << endl;
-    } else {
-        cout << "Palavra encontrada nas posições: ";
-        for (size_t pos : posicoes) {
-            cout << pos << " ";
-        }
-        cout << endl << endl;
-    }
-
+    imprimirPosicoes(posicoes);
 
     // pausa para o usuário ler melhor os dados
     cout << "Pressione Enter para continuar...";
@@ -161,5 +157,45 @@ void administraVisualizacao(){
     cout << "\nPalavras mais frequentes do Texto:\n";
     for (auto& par : palavras) {
         cout << par.first << "  " << par.second << endl;
+    }
+}
+
+void administraDataMining(const string& texto) {
+    size_t escolhaMenu;
+
+    // Menu
+    while(true){
+        cout << "┌──────────────────────────────────────┐" << endl;
+        cout << "│                 MENU                 │" << endl;
+        cout << "├──────────────────────────────────────┤" << endl;
+        cout << "│ 1 - Buscar datas                     │" << endl;
+        cout << "│ 2 - Buscar telefones                 │" << endl;
+        cout << "│ 3 - Buscar emails                    │" << endl;
+        cout << "│ 0 - Sair                             │" << endl;
+        cout << "└──────────────────────────────────────┘" << endl;
+        cout << "Escolha uma opção: ";
+        cin >> escolhaMenu;
+
+        switch (escolhaMenu)
+        {
+        case 1:
+            encontrarDatas(texto);
+            break;
+
+        case 2:
+            encontrarTelefones(texto);
+            break;
+
+        case 3:
+            encontrarEmails(texto);
+            break;
+
+        case 0:
+            return;
+
+        default:
+            cout << "Opção errada, escolha novamente!" << endl;
+            break;
+        }
     }
 }
