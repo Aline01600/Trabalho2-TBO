@@ -13,7 +13,7 @@ using namespace std;
 // Cabeçalhos das funções que administram as tarefas
 void administraKMP(const string& texto);
 void administraCifra(const string& texto);
-void administraVisualizacao();
+void administraVisualizacao(const string& texto);
 void administraDataMining(const string& texto);
 
 void mostrarResumoEGerarArquivoOpcional(const string& texto, const string& nomeArquivo, int linhasParaMostrar = 10) {
@@ -86,7 +86,7 @@ cout << "Escolha uma opcao: ";
             administraKMP(texto);
             break;
         case 2:
-            administraVisualizacao();
+            administraVisualizacao(texto);
             break;
         case 3:
             administraCifra(texto);
@@ -140,14 +140,12 @@ void administraCifra(const string& texto) {
     cin.get(); // espera o Enter para continuar
 }
 
-void administraVisualizacao(){
+void administraVisualizacao(const string& texto){
     TabelaHash tabela;
 
     unordered_set<string> stopwords = carregarStopwords("stopwords.txt");
 
-    string nome_arquivo = "texto.txt";
-
-    processar_arquivo(nome_arquivo, tabela, stopwords);
+    mapear_string_normalizada(texto, tabela, stopwords);
 
     auto palavras = tabela.obter_palavras();
 

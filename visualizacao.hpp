@@ -53,5 +53,5 @@ struct TabelaHash {
 
 void quickSort(std :: vector< std :: pair<std :: string, int>>& v, int esquerda, int direita);
 std :: unordered_set<std :: string> carregarStopwords(const std :: string& nome_arquivo); 
-void processar_arquivo(const std :: string& nome_arquivo, TabelaHash& tabela, const std :: unordered_set<std :: string>& stopwords);
+void mapear_string_normalizada(const std::string& texto_normalizado, TabelaHash& tabela, const std::unordered_set<std::string>& stopwords);
 #endif

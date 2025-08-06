@@ -1,16 +1,19 @@
-/* ARQUIVO COM FUNÇÕES ÚTEIS. SE HÁ UMA FUNÇÃO ÚTIL AO PROJETO COMO UM TODO, COLOQUE AQUI*/
-
 #include "utilidades.hpp"
+#include <unordered_map>
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include <string>
-#include <unordered_map>
 
+size_t utf8CharLen(unsigned char c) {
+    if (c < 128) return 1;
+    else if ((c >> 5) == 0x6) return 2;
+    else if ((c >> 4) == 0xE) return 3;
+    else if ((c >> 3) == 0x1E) return 4;
+    return 1;
+}
 
-// Função que remove os acentos da string
-string removerAcentos(const string& texto) {
-    unordered_map<string, char> mapa = {
+std::string removerAcentos(const std::string& texto) {
+    std::unordered_map<std::string, char> mapa = {
         {"á",'a'}, {"à",'a'}, {"ã",'a'}, {"â",'a'}, {"ä",'a'},
         {"é",'e'}, {"è",'e'}, {"ê",'e'}, {"ë",'e'},
         {"í",'i'}, {"ì",'i'}, {"î",'i'}, {"ï",'i'},
@@ -25,95 +28,52 @@ string removerAcentos(const string& texto) {
         {"Ç",'c'}
     };
 
-    string resultado;
+    std::string resultado;
     for (size_t i = 0; i < texto.size();) {
-        // Se for o início de um caractere UTF-8 multibyte
-        if ((unsigned char)texto[i] >= 192) {
-            string caractere_utf8 = texto.substr(i, 2);
-            auto it = mapa.find(caractere_utf8);
-            if (it != mapa.end()) {
-                resultado += it->second;
-            } else {
-                resultado += caractere_utf8;
-            }
-            i += 2;
-        } else {
-            resultado += texto[i];
-            i++;
-        }
-    }
+        size_t len = utf8CharLen((unsigned char)texto[i]);
+        std::string c = texto.substr(i, len);
 
+        auto it = mapa.find(c);
+        if (it != mapa.end()) resultado += it->second;
+        else resultado += c;
+
+        i += len;
+    }
     return resultado;
 }
 
-// Função que transforma a string em minúscula
-string paraMinusculo(const string& s) {
-    string resultado = s;
-
-    for (size_t i = 0; i < resultado.size(); i++) {
-        char c = resultado[i];      
-        /* Em ASCII:
-            -  letras maiúsculas vão do 'A' (65) até 'Z' (90)
-            -  letras minúsculas vão do 'a' (97) até 'z' (122)
-
-            A diferença entre maiúscula e minúscula é 32, então somando 32 ao caractere, é encontrada sua versão minúsucla
-        */
-        if (c >= 'A' && c <= 'Z') {
-            resultado[i] = c + 32;
-        }
+std::string paraMinusculo(const std::string& s) {
+    std::string resultado;
+    for (unsigned char c : s) {
+        if (c >= 'A' && c <= 'Z') resultado += c + 32;
+        else resultado += c;
     }
-    return resultado;    
-}
-
-// Converte a string para facilitar a manipulação
-string normalizarTexto(const string& s) {
-    string resultado;
-
-    // remove acento
-    resultado = removerAcentos(s);
-    // deixa minúsculo
-    resultado = paraMinusculo(resultado);
-
     return resultado;
 }
 
+std::string normalizarTexto(const std::string& s) {
+    return paraMinusculo(removerAcentos(s));
+}
 
-// Lê um arquivo .txt e retorna uma string
-string lerArquivo(const string& nomeArquivo) {
-    ifstream arquivo(nomeArquivo);
-
-    // tratamento de erro
+std::string lerArquivo(const std::string& nomeArquivo) {
+    std::ifstream arquivo(nomeArquivo);
     if (!arquivo) {
-        cerr << "Erro ao abrir o arquivo " << nomeArquivo << endl;
+        std::cerr << "Erro ao abrir o arquivo " << nomeArquivo << std::endl;
         return "";
     }
-
-    stringstream buffer;
-    buffer << arquivo.rdbuf(); // copia a leitura do arquivo para o buffer
-
-    return buffer.str(); // converte o buffer em string e retorna
+    std::stringstream buffer;
+    buffer << arquivo.rdbuf();
+    return buffer.str();
 }
 
-
-void imprimirPosicoes(const vector<size_t>& posicoes) {
+void imprimirPosicoes(const std::vector<size_t>& posicoes) {
     if (posicoes.empty()) {
-        cout << "Palavra não encontrada no texto." << endl;
+        std::cout << "Palavra não encontrada no texto." << std::endl;
     } else {
-        cout << "Palavra encontrada nas posições: ";
+        std::cout << "Palavra encontrada nas posições: ";
         for (size_t pos : posicoes) {
-            cout << pos << " ";
+            std::cout << pos << " ";
         }
-        cout << endl << endl;
+        std::cout << std::endl << std::endl;
     }
-}
-
-
-string normalizar(const string& palavra) {
-    string limpa;
-    for (unsigned char c : palavra) {
-        if (isalpha(c) || (c >= 128)) {
-            limpa += tolower(c);
-        }
-    }
-    return limpa;
 }

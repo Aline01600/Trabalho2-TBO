@@ -1,72 +1,61 @@
-#include <iostream>
-#include <fstream>
 #include "visualizacao.hpp"
+#include "utilidades.hpp"
+#include <iostream>
+#include <sstream>
+#include <fstream>
 
-
-using namespace std;
-
-// QuickSort (ordena por frequência decrescente)
-void quickSort(vector<pair<string, int>>& v, int esquerda, int direita) {
+// QuickSort
+void quickSort(std::vector<std::pair<std::string,int>>& v, int esquerda, int direita) {
     if (esquerda >= direita) return;
 
-    int meio = esquerda + (direita - esquerda) / 2;
+    int meio = esquerda + (direita-esquerda)/2;
     int pivo = v[meio].second;
+    int i=esquerda, j=direita;
 
-    int i = esquerda;
-    int j = direita;
-
-    while (i <= j) {
-        while (v[i].second > pivo) i++;  // Maior frequência primeiro
-        while (v[j].second < pivo) j--;
-
-        if (i <= j) {
-            pair<string, int> temp = v[i];
-            v[i] = v[j];
-            v[j] = temp;
-            i++;
-            j--;
+    while(i <= j){
+        while(v[i].second > pivo) i++;
+        while(v[j].second < pivo) j--;
+        if(i <= j){
+            std::swap(v[i], v[j]);
+            i++; j--;
         }
     }
 
-    if (esquerda < j)
-        quickSort(v, esquerda, j);
-    if (i < direita)
-        quickSort(v, i, direita);
+    if(esquerda<j) quickSort(v, esquerda, j);
+    if(i<direita) quickSort(v, i, direita);
 }
 
 // Carregar stopwords
-unordered_set<string> carregarStopwords(const string& nome_arquivo) {
-    unordered_set<string> stopwords;
-    ifstream arquivo(nome_arquivo);
-    if (!arquivo) {
-        cerr << "Aviso: não foi possível abrir o arquivo de stopwords: " << nome_arquivo << endl;
+std::unordered_set<std::string> carregarStopwords(const std::string& nome_arquivo){
+    std::unordered_set<std::string> stopwords;
+    std::ifstream arquivo(nome_arquivo);
+    if(!arquivo){
+        std::cerr << "Aviso: não foi possível abrir o arquivo de stopwords: " << nome_arquivo << std::endl;
         return stopwords;
     }
-    string palavra;
-    while (arquivo >> palavra) {
-        palavra = normalizar(palavra);
-        if (!palavra.empty()) {
-            stopwords.insert(palavra);
-        }
+    std::string palavra;
+    while(arquivo >> palavra){
+        palavra = normalizarTexto(palavra);
+        if(!palavra.empty()) stopwords.insert(palavra);
     }
     return stopwords;
 }
 
-// Processar arquivo de texto
-void processar_arquivo(const string& nome_arquivo, TabelaHash& tabela, const unordered_set<string>& stopwords) {
-    ifstream arquivo(nome_arquivo);
-    if (!arquivo) {
-        cerr << "Erro ao abrir o arquivo: " << nome_arquivo << endl;
-        return;
-    }
+// Mapear texto normalizado para tabela hash
+void mapear_string_normalizada(const std::string& texto, TabelaHash& tabela, const std::unordered_set<std::string>& stopwords){
+    std::istringstream stream(texto);
+    std::string palavra;
 
-    string palavra;
-    while (arquivo >> palavra) {
-        string limpa = normalizar(palavra);
-        if (!limpa.empty() && stopwords.count(limpa) == 0) {
+    while(stream >> palavra){
+        palavra = normalizarTexto(palavra);
+
+        std::string limpa;
+        for(char c : palavra){
+            if((c>='a' && c<='z') || (c>='A' && c<='Z')) limpa += c;
+        }
+
+        if(!limpa.empty() && stopwords.find(limpa)==stopwords.end()){
             tabela.inserir(limpa);
         }
     }
-
-    arquivo.close();
 }
