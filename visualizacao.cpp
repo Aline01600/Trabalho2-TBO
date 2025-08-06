@@ -1,3 +1,9 @@
+/*por enquanto se quiserem testar rode 
+g++ -std=c++17 -Wall -O2 -o visualizacao visualizacao.cpp utilitarios.cpp 
+
+./visualizacao
+*/
+
 #include <iostream>
 #include <fstream>
 #include <string>
