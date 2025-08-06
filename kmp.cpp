@@ -1,29 +1,10 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include "utilidades.hpp"
 
 using namespace std;
 
-// Função que transforma a string em minúscula
-string paraMinusculo(const string& s) {
-    string resultado = s;
-
-    for (size_t i = 0; i < resultado.size(); i++) {
-        char c = resultado[i];
-        
-        /* Em ASCII:
-            -  letras maiúsculas vão do 'A' (65) até 'Z' (90)
-            -  letras minúsculas vão do 'a' (97) até 'z' (122)
-
-            A diferença entre maiúscula e minúscula é 32, então somando 32 ao caractere, é encontrada sua versão minúsucla
-        */
-    
-        if (c >= 'A' && c <= 'Z') {
-            resultado[i] = c + 32;
-        }
-    }
-    return resultado;    
-}
 
 // Função que constroi vetor de prefixos
 std::vector<size_t> construirPrefixo(const std::string& padrao) {
@@ -66,8 +47,8 @@ std::vector<size_t> buscarKMP(const std::string& texto, const std::string& padra
 
     string text, pattern;
 
-    text = paraMinusculo(texto);
-    pattern = paraMinusculo(padrao);
+    text = normalizarTexto(texto);
+    pattern = normalizarTexto(padrao);
     
     vector<size_t> posicoes;
     vector<size_t> prefixo = construirPrefixo(pattern);
