@@ -1,13 +1,45 @@
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
 #include "kmp.hpp"
 #include "utilidades.hpp"
+#include "cifra.hpp"
 
 using namespace std;
 
 // Cabeçalhos das funções que administram as tarefas
 void administraKMP(const string& texto);
+void administraCifra(const string& texto);
+
+void mostrarResumoEGerarArquivoOpcional(const string& texto, const string& nomeArquivo, int linhasParaMostrar = 10) {
+    // Mostra as primeiras linhas no terminal
+    int linhasMostradas = 0;
+    for (size_t i = 0; i < texto.size() && linhasMostradas < linhasParaMostrar; ++i) {
+        cout << texto[i];
+        if (texto[i] == '\n') linhasMostradas++;
+    }
+    cout << "\n[... texto truncado ...]\n";
+
+    // Pergunta se usuário quer salvar o texto completo em arquivo
+    cout << "Deseja salvar o texto completo no arquivo '" << nomeArquivo << "'? (s/n): ";
+    char opcao;
+    cin >> opcao;
+    cin.ignore(); // limpa o \n pendente
+
+    if (opcao == 's' || opcao == 'S') {
+        ofstream arq(nomeArquivo);
+        if (!arq) {
+            cerr << "Erro ao abrir arquivo para salvar o texto: " << nomeArquivo << endl;
+            return;
+        }
+        arq << texto;
+        arq.close();
+        cout << "Texto completo salvo em '" << nomeArquivo << "'." << endl;
+    } else {
+        cout << "Arquivo não salvo." << endl;
+    }
+}
 
 
 int main() {
@@ -22,23 +54,35 @@ int main() {
 
     // Menu
     while(true){
-        cout << "┌──────────────────────────────────────┐" << endl;
+       /* cout << "┌──────────────────────────────────────┐" << endl;
         cout << "│                 MENU                 │" << endl;
         cout << "├──────────────────────────────────────┤" << endl;
         cout << "│ 1 - Busca com KMP                    │" << endl;
         cout << "│ 2 - Opção 2                          │" << endl;
-        cout << "│ 3 - Opção 3                          │" << endl;
+        cout << "│ 3 - Cifrar / Decifrar                │" << endl;
         cout << "│ 0 - Sair                             │" << endl;
         cout << "└──────────────────────────────────────┘" << endl;
         cout << "Escolha uma opção: ";
         cin >> escolhaMenu;
-
+*/
+        cout << "===============================" << endl;
+cout << "           MENU                " << endl;
+cout << "===============================" << endl;
+cout << "1 - Busca com KMP" << endl;
+cout << "2 - Visualizar Texto Destacado" << endl;
+cout << "3 - Cifrar / Decifrar Texto" << endl;
+cout << "0 - Sair" << endl;
+cout << "===============================" << endl;
+cout << "Escolha uma opcao: ";
+        cin >> escolhaMenu;
         switch (escolhaMenu)
         {
         case 1:
             administraKMP(texto);
             break;
-
+        case 3:
+            administraCifra(texto);
+            break;
         case 0:
             return 0;
 
@@ -76,4 +120,21 @@ void administraKMP(const string& texto) {
     // pausa para o usuário ler melhor os dados
     cout << "Pressione Enter para continuar...";
     cin.get();    // espera o Enter
+}
+
+void administraCifra(const string& texto) {
+    char chave[26];
+    gerarChaveAleatoria(chave);
+
+    string criptografado = criptografarTexto(texto, chave);
+    string decifrado = descriptografarTexto(criptografado, chave);
+
+    cout << "\nTexto original normalizado e cifrado:" << endl;
+    mostrarResumoEGerarArquivoOpcional(criptografado, "cifrado.txt");
+
+    cout << "\nTexto decifrado:" << endl;
+    mostrarResumoEGerarArquivoOpcional(decifrado, "decifrado.txt");
+
+    cout << "\nPressione Enter para continuar...";
+    cin.get(); // espera o Enter para continuar
 }
