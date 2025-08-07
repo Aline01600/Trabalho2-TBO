@@ -152,9 +152,12 @@ void administraVisualizacao(const string& texto){
     // Ordenar com quicksort por frequência decrescente
     quickSort(palavras, 0, palavras.size() - 1);
 
+    int contador = 0;
     cout << "\nPalavras mais frequentes do Texto:\n";
     for (auto& par : palavras) {
+        if(contador >= 10) break;
         cout << par.first << "  " << par.second << endl;
+        contador++;
     }
 }
 
